@@ -108,6 +108,7 @@ class PaypalNativeCheckout {
   ///was not called before this function
   Future<void> makeOrder({
     FPayPalUserAction action = FPayPalUserAction.payNow,
+    Map<String, dynamic>? address,
   }) async {
     if (!_initiated) {
       throw Exception(
@@ -125,6 +126,10 @@ class PaypalNativeCheckout {
         action,
       ),
     };
+
+    if (address != null) {
+      data["address"] = jsonEncode(address);
+    }
 
     await _methodChannel.invokeMethod<String>('FlutterPaypal#makeOrder', data);
   }

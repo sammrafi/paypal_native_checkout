@@ -155,10 +155,17 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   );
                 }
-                // initPayPal();
+                Map<String, dynamic>? getAddress = {
+                  'line1': '456 Main Dt',
+                  'line2': 'Apt 4B',
+                  'city': 'San Jose',
+                  'state': 'CA',
+                  'postalCode': '95131',
+                  'countryCode': 'US',
+                };
+
                 _paypalNativeCheckoutPlugin.makeOrder(
-                  action: FPayPalUserAction.payNow,
-                );
+                    action: FPayPalUserAction.payNow, address: getAddress);
               },
             ),
           ],

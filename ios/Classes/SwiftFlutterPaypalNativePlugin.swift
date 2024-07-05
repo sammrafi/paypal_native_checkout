@@ -79,6 +79,32 @@ public class SwiftPaypalNativeCheckoutPlugin: NSObject, FlutterPlugin {
         ))
     }
 
+    func createShipping(from addressDetails: [String: Any]) -> PurchaseUnit.Shipping? {
+        guard let line1 = addressDetails["line1"] as? String,
+              let city = addressDetails["city"] as? String,
+              let state = addressDetails["state"] as? String,
+              let postalCode = addressDetails["postalCode"] as? String,
+              let countryCode = addressDetails["countryCode"] as? String else {
+            return nil
+        }
+
+        // let recipientName = addressDetails["recipientName"] as? String,
+    
+        let line2 = addressDetails["line2"] as? String ?? ""
+    
+        return PurchaseUnit.Shipping(
+            address: .init(
+                countryCode: countryCode,
+                addressLine1: line1,
+                addressLine2: line2,
+                adminArea1: state,
+                adminArea2: city,
+                postalCode: postalCode
+            )
+        )
+    }
+
+
     func makeOrder(_ call: FlutterMethodCall, _ result: @escaping FlutterResult) -> Void {
         guard let args = call.arguments as? [String: Any] else {
             result(FlutterError(
@@ -93,6 +119,26 @@ public class SwiftPaypalNativeCheckoutPlugin: NSObject, FlutterPlugin {
         let userAction = userActionFromString(userActionStr)
 
         let listCustomUnit = try! JSONDecoder().decode([CustomUnit].self, from: purchaseUnitsStr.data(using: .utf8)!)
+        
+        // Address check and serializer
+        var shipping: PurchaseUnit.Shipping? = nil
+        if let addressJson = args["address"] as? String {
+            if let addressData = addressJson.data(using: .utf8) {
+                do {
+                    if let addressDetails = try JSONSerialization.jsonObject(with: addressData, options: []) as? [String: Any] {
+                        shipping = createShipping(from: addressDetails)
+                    }
+                } catch {
+                    result(FlutterError(
+                            code: "JSON_PARSE_ERROR",
+                            message: "Error parsing address JSON",
+                            details: error.localizedDescription
+                    ))
+                    return
+                }
+            }
+        }
+
         var purchaseUnits: [PurchaseUnit] = []
         for customUnit in listCustomUnit {
             let amount = PayPalCheckout.PurchaseUnit.Amount(
@@ -102,15 +148,18 @@ public class SwiftPaypalNativeCheckoutPlugin: NSObject, FlutterPlugin {
 
             let purchaseUnit = PayPalCheckout.PurchaseUnit(
                     amount: amount,
-                    referenceId: customUnit.referenceId
+                    referenceId: customUnit.referenceId,
+                    shipping: shipping
             )
 
             purchaseUnits.append(purchaseUnit)
         }
+
+        
         Checkout.start(
                 createOrder: { action in
                     let order = OrderRequest(
-                            intent: .capture,
+                            intent: .authorize,
                             purchaseUnits: purchaseUnits,
                             applicationContext: OrderApplicationContext(userAction: userAction)
                     )
@@ -121,6 +170,8 @@ public class SwiftPaypalNativeCheckoutPlugin: NSObject, FlutterPlugin {
                     print("Error creating order: \(error)")
                 }
         )
+
+        result(nil)
 
     }
 }
