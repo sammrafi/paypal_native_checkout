@@ -3,7 +3,7 @@ import UIKit
 import PayPalCheckout
 
 public class SwiftPaypalNativeCheckoutPlugin: NSObject, FlutterPlugin {
-    private static let METHOD_CHANNEL_NAME = "flutter_paypal_native"
+    private static let METHOD_CHANNEL_NAME = "paypal_native_checkout"
 
     static var channel: FlutterMethodChannel?
     static var paypalCallBackHelper: PayPalCallBackHelper?

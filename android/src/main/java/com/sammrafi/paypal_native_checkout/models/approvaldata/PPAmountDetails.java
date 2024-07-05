@@ -9,7 +9,7 @@ import com.paypal.pyplcheckout.data.model.pojo.Buyer;
 import com.sammrafi.paypal_native_checkout.models.CurrencyCodeHelper;
 
 
-public class PPAmount {
+public class PPAmountDetails {
 
     @SerializedName("currencyFormat")
     @Expose
@@ -67,8 +67,8 @@ public class PPAmount {
         this.currencyValue = currencyValue;
     }
 
-    public static PPAmount fromPayPalObject(Amount amount) {
-        PPAmount app = new PPAmount();
+    public static PPAmountDetails fromPayPalObject(Amount amount) {
+        PPAmountDetails app = new PPAmountDetails();
         app.setCurrencyCode(amount.getCurrencyCode());
         app.setCurrencyFormat(amount.getCurrencyFormat());
         app.setCurrencySymbol(amount.getCurrencySymbol());

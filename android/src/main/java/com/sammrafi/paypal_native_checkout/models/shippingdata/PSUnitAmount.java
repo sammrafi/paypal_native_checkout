@@ -5,7 +5,7 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.paypal.checkout.order.UnitAmount;
 import com.sammrafi.paypal_native_checkout.models.CurrencyCodeHelper;
-import com.sammrafi.paypal_native_checkout.models.approvaldata.PPAmount;
+import com.sammrafi.paypal_native_checkout.models.approvaldata.PPAmountDetails;
 
 
 public class PSUnitAmount {

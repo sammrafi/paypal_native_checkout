@@ -5,7 +5,7 @@ import 'package:paypal_native_checkout/paypal_native_checkout_method_channel.dar
 void main() {
   MethodChannelPaypalNativeCheckout platform =
       MethodChannelPaypalNativeCheckout();
-  const MethodChannel channel = MethodChannel('flutter_paypal_native');
+  const MethodChannel channel = MethodChannel('paypal_native_checkout');
 
   TestWidgetsFlutterBinding.ensureInitialized();
 

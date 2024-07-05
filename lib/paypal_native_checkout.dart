@@ -16,7 +16,7 @@ import 'models/custom/order_callback.dart';
 class PaypalNativeCheckout {
   static PaypalNativeCheckout? _instance;
   bool _initiated = false;
-  final _methodChannel = const MethodChannel('flutter_paypal_native');
+  final _methodChannel = const MethodChannel('paypal_native_checkout');
   List<FPayPalPurchaseUnit> purchaseUnits = [];
   //default callback does nothing
   FPayPalOrderCallback _callback = FPayPalOrderCallback(

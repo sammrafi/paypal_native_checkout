@@ -67,7 +67,7 @@ class _MyHomePageState extends State<MyHomePage> {
     //initiate payPal plugin
     await _paypalNativeCheckoutPlugin.init(
       //your app id !!! No Underscore!!! see readme.md for help
-      returnUrl: "com.sammrafi.flutter.paypal.native.example://paypalpay",
+      returnUrl: "com.example.paypal.native.checkout.example://paypalpay",
       //client id from developer dashboard
       clientID: "AUJNd...",
       //sandbox, staging, live etc
