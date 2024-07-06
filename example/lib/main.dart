@@ -67,9 +67,9 @@ class _MyHomePageState extends State<MyHomePage> {
     //initiate payPal plugin
     await _paypalNativeCheckoutPlugin.init(
       //your app id !!! No Underscore!!! see readme.md for help
-      returnUrl: "com.example.paypal.native.checkout.example://paypalpay",
+      returnUrl: "com.example.example://paypalpay",
       //client id from developer dashboard
-      clientID: "AUJNd...",
+      clientID: "ATeY...",
       //sandbox, staging, live etc
       payPalEnvironment: FPayPalEnvironment.sandbox,
       //what currency do you plan to use? default is US dollars

@@ -11,11 +11,15 @@ import com.paypal.checkout.config.CheckoutConfig;
 import com.paypal.checkout.config.Environment;
 import com.paypal.checkout.createorder.CurrencyCode;
 import com.paypal.checkout.createorder.OrderIntent;
+import com.paypal.checkout.createorder.ShippingPreference;
 import com.paypal.checkout.createorder.UserAction;
 import com.paypal.checkout.order.Amount;
 import com.paypal.checkout.order.AppContext;
 import com.paypal.checkout.order.OrderRequest;
 import com.paypal.checkout.order.PurchaseUnit;
+import com.paypal.checkout.order.Address;
+import com.paypal.checkout.order.Shipping;
+
 import com.sammrafi.paypal_native_checkout.models.CheckoutConfigStore;
 import com.sammrafi.paypal_native_checkout.models.CurrencyCodeHelper;
 import com.sammrafi.paypal_native_checkout.models.EnvironmentHelper;
@@ -23,6 +27,7 @@ import com.sammrafi.paypal_native_checkout.models.PayPalCallBackHelper;
 import com.sammrafi.paypal_native_checkout.models.PurchaseUnitC;
 import com.sammrafi.paypal_native_checkout.models.PurchaseUnitHelper;
 import com.sammrafi.paypal_native_checkout.models.UserActionHelper;
+import com.sammrafi.paypal_native_checkout.models.shippingdata.PSShippingChangeAddress;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +40,15 @@ import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 
+
+import org.json.JSONObject;
+import org.json.JSONException;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 /** PaypalNativeCheckoutPlugin */
 public class PaypalNativeCheckoutPlugin extends FlutterRegistrarResponder
         implements FlutterPlugin, MethodCallHandler, ActivityAware {
@@ -144,6 +158,26 @@ public class PaypalNativeCheckoutPlugin extends FlutterRegistrarResponder
         initialisedPaypalConfig = true;
     }
 
+//    private Shipping createShipping(Map<String, Object> addressDetails) {
+//        String line1 = (String) addressDetails.get("line1");
+//        String city = (String) addressDetails.get("city");
+//        String state = (String) addressDetails.get("state");
+//        String postalCode = (String) addressDetails.get("postalCode");
+//        String countryCode = (String) addressDetails.get("countryCode");
+//        String line2 = (String) addressDetails.get("line2");
+//
+//        return new Shipping.Builder()
+//                .address(new ShippingAddress.Builder()
+//                        .addressLine1(line1)
+//                        .addressLine2(line2)
+//                        .adminArea2(city)
+//                        .adminArea1(state)
+//                        .postalCode(postalCode)
+//                        .countryCode(countryCode)
+//                        .build())
+//                .build();
+//    }
+
     private void makeOrder(@NonNull MethodCall call, @NonNull Result result) {
         if (!initialisedPaypalConfig) {
             initialisePaypalConfig();
@@ -157,13 +191,39 @@ public class PaypalNativeCheckoutPlugin extends FlutterRegistrarResponder
                 .convertJsonToArrayList(purchaseUnitsStr);
         CurrencyCodeHelper helper = (new CurrencyCodeHelper());
 
+        final Shipping shipping;
+        if (call.argument("address") != null) {
+            String addressJson = call.argument("address");
+            try {
+                JSONObject addressObject = new JSONObject(addressJson);
+                Address address = new Address.Builder()
+                        .addressLine1(addressObject.getString("line1"))
+                        .addressLine2(addressObject.getString("line2"))
+                        .adminArea2(addressObject.getString("city"))
+                        .adminArea1(addressObject.getString("state"))
+                        .postalCode(addressObject.getString("postalCode"))
+                        .countryCode(addressObject.getString("countryCode"))
+                        .build();
+
+                shipping = new Shipping.Builder()
+                        .address(address)
+                        .build();
+
+            } catch (JSONException e) {
+                result.error("JSON_PARSE_ERROR", "Error parsing address JSON", e.getLocalizedMessage());
+                return;
+            }
+        }else{
+            shipping = null;
+        }
+
+
         try {
             PayPalCheckout.startCheckout(
                     createOrderActions -> {
                         ArrayList<PurchaseUnit> purchaseUnits = new ArrayList<>();
                         for (PurchaseUnitC purchaseUnit : purchaseUnitsC) {
-                            CurrencyCode currency = helper.getEnumFromString(
-                                    purchaseUnit.getCurrency());
+                            CurrencyCode currency = helper.getEnumFromString(purchaseUnit.getCurrency());
                             purchaseUnits.add(
                                     new PurchaseUnit.Builder()
                                             .amount(
@@ -172,14 +232,19 @@ public class PaypalNativeCheckoutPlugin extends FlutterRegistrarResponder
                                                             .value(purchaseUnit.getPrice())
                                                             .build())
                                             .referenceId(purchaseUnit.getReferenceID())
-                                            .build());
+                                            .shipping(shipping)
+                                            .build()
+                            );
+
                         }
+
+
                         OrderRequest order = new OrderRequest(
-                                OrderIntent.CAPTURE,
-                                new AppContext.Builder()
-                                        .userAction(userAction)
-                                        .build(),
+                                OrderIntent.AUTHORIZE,
+                                new AppContext.Builder().userAction(userAction).build(),
                                 purchaseUnits);
+
+
                         createOrderActions.create(order, orderId -> {
                         });
                     });
@@ -189,6 +254,23 @@ public class PaypalNativeCheckoutPlugin extends FlutterRegistrarResponder
 
             result.error("completed", e.getMessage(), e.getMessage());
         }
+    }
+
+    // Helper method to convert JSONObject to Map<String, Object>
+    private Map<String, Object> toMap(JSONObject jsonObject) throws JSONException {
+        Map<String, Object> map = new HashMap<>();
+        Iterator<String> keys = jsonObject.keys();
+
+        while (keys.hasNext()) {
+            String key = keys.next();
+            Object value = jsonObject.get(key);
+
+            if (value instanceof JSONObject) {
+                value = toMap((JSONObject) value);
+            }
+            map.put(key, value);
+        }
+        return map;
     }
 
 }
