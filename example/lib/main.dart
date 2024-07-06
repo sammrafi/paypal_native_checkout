@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:paypal_native_checkout/models/custom/shipping_preference.dart';
 import 'package:paypal_native_checkout/paypal_native_checkout.dart';
 import 'package:paypal_native_checkout/models/custom/currency_code.dart';
 import 'package:paypal_native_checkout/models/custom/environment.dart';
@@ -141,7 +142,10 @@ class _MyHomePageState extends State<MyHomePage> {
                 };
 
                 _paypalNativeCheckoutPlugin.makeOrder(
-                    action: FPayPalUserAction.payNow, address: getAddress);
+                    action: FPayPalUserAction.payNow,
+                    shippingPreference: FPayPalShippingPreference.setProvidedAddress,
+                    address: getAddress
+                );
               },
             ),
           ],

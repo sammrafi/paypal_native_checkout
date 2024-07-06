@@ -11,6 +11,7 @@ import 'models/custom/currency_code.dart';
 import 'models/custom/environment.dart';
 import 'models/custom/purchase_unit.dart';
 import 'models/custom/user_action.dart';
+import 'models/custom/shipping_preference.dart';
 import 'models/custom/order_callback.dart';
 
 class PaypalNativeCheckout {
@@ -108,6 +109,7 @@ class PaypalNativeCheckout {
   ///was not called before this function
   Future<void> makeOrder({
     FPayPalUserAction action = FPayPalUserAction.payNow,
+    FPayPalShippingPreference shippingPreference = FPayPalShippingPreference.getFromFile,
     Map<String, dynamic>? address,
   }) async {
     if (!_initiated) {
@@ -125,6 +127,7 @@ class PaypalNativeCheckout {
       "userAction": FPayPalUserActionHelper.convertFromEnumToString(
         action,
       ),
+      "shippingPreference": FPayPalShippingPreferenceHelper.convertFromEnumToString(shippingPreference)
     };
 
     if (address != null) {

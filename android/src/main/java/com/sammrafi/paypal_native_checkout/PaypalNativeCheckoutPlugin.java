@@ -27,6 +27,7 @@ import com.sammrafi.paypal_native_checkout.models.PayPalCallBackHelper;
 import com.sammrafi.paypal_native_checkout.models.PurchaseUnitC;
 import com.sammrafi.paypal_native_checkout.models.PurchaseUnitHelper;
 import com.sammrafi.paypal_native_checkout.models.UserActionHelper;
+import com.sammrafi.paypal_native_checkout.models.ShippingPreferenceHelper;
 import com.sammrafi.paypal_native_checkout.models.shippingdata.PSShippingChangeAddress;
 
 import java.util.ArrayList;
@@ -44,10 +45,8 @@ import io.flutter.plugin.common.MethodChannel.Result;
 import org.json.JSONObject;
 import org.json.JSONException;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 /** PaypalNativeCheckoutPlugin */
 public class PaypalNativeCheckoutPlugin extends FlutterRegistrarResponder
@@ -158,26 +157,6 @@ public class PaypalNativeCheckoutPlugin extends FlutterRegistrarResponder
         initialisedPaypalConfig = true;
     }
 
-//    private Shipping createShipping(Map<String, Object> addressDetails) {
-//        String line1 = (String) addressDetails.get("line1");
-//        String city = (String) addressDetails.get("city");
-//        String state = (String) addressDetails.get("state");
-//        String postalCode = (String) addressDetails.get("postalCode");
-//        String countryCode = (String) addressDetails.get("countryCode");
-//        String line2 = (String) addressDetails.get("line2");
-//
-//        return new Shipping.Builder()
-//                .address(new ShippingAddress.Builder()
-//                        .addressLine1(line1)
-//                        .addressLine2(line2)
-//                        .adminArea2(city)
-//                        .adminArea1(state)
-//                        .postalCode(postalCode)
-//                        .countryCode(countryCode)
-//                        .build())
-//                .build();
-//    }
-
     private void makeOrder(@NonNull MethodCall call, @NonNull Result result) {
         if (!initialisedPaypalConfig) {
             initialisePaypalConfig();
@@ -185,7 +164,9 @@ public class PaypalNativeCheckoutPlugin extends FlutterRegistrarResponder
 
         String purchaseUnitsStr = call.argument("purchaseUnits");
         String userActionStr = call.argument("userAction");
+        String shippingPreferenceStr = call.argument("shippingPreference");
         UserAction userAction = (new UserActionHelper()).getEnumFromString(userActionStr);
+        ShippingPreference shippingPreference = (new ShippingPreferenceHelper()).getEnumFromString(shippingPreferenceStr);
 
         List<PurchaseUnitC> purchaseUnitsC = (new PurchaseUnitHelper())
                 .convertJsonToArrayList(purchaseUnitsStr);
@@ -241,7 +222,7 @@ public class PaypalNativeCheckoutPlugin extends FlutterRegistrarResponder
 
                         OrderRequest order = new OrderRequest(
                                 OrderIntent.AUTHORIZE,
-                                new AppContext.Builder().userAction(userAction).build(),
+                                new AppContext.Builder().userAction(userAction).shippingPreference(shippingPreference).build(),
                                 purchaseUnits);
 
 
