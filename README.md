@@ -1,37 +1,46 @@
-# Native Paypal integration with Flutter
 
+# Native Paypal integration with Flutter
 [![pub package](https://img.shields.io/pub/v/paypal_native_checkout.svg)](https://pub.dev/packages/paypal_native_checkout)
 
-A Flutter plugin that provides a method for PayPal payment natively  (No Webview).
+Introducing a Flutter plugin for seamless PayPal payments with native support for both Android and iOS. This package eliminates the need for WebView, offering a streamlined and efficient checkout experience.
 
-Now supports Android and iOS 🌟⚡. :)
+**(No WebView required)**
 
+### Improvements
+- Fixed endless loading issue.
+- Added support for passing shipping address from Flutter.
 
-|             | Android | iOS |
-| ----------- | ------- | --- |
-| **Support** | SDK 21+ | all |
+  
+## Requirements
 
-[Checkout IOS Doc](https://developer.paypal.com/limited-release/paypal-mobile-checkout/initialize-sdk/)
+| Platform    | Supported Versions  |
+| ----------- | ------------------- |
+| **Android** | API level 21 and above |
+| **iOS**     | Version 13.0 and above |
 
-[Checkout Android Doc](https://developer.paypal.com/limited-release/paypal-mobile-checkout/initialize-sdk/)
+For detailed setup instructions, visit the [PayPal Mobile Checkout documentation](https://developer.paypal.com/limited-release/paypal-mobile-checkout/initialize-sdk/).
 
-[Github Android SDK](https://github.com/paypal/android-checkout-sdk)
+### GitHub Repositories
 
-[Github IOS](https://github.com/paypal/paypalcheckout-ios)
+- [Android SDK](https://github.com/paypal/android-checkout-sdk)
+- [iOS SDK](https://github.com/paypal/paypalcheckout-ios)
 
-<img src="https://github.com/sammrafi/paypal_native_checkout/raw/main/resources/media/flutter_paypal.gif?raw=true" alt="Screenshot" height="400" />
+## Demo
+<img src="https://github.com/sammrafi/paypal_native_checkout/raw/main/resources/media/flutter_paypal.gif?raw=true" alt="Android Demo" height="400" />
 
-<img src="https://github.com/sammrafi/paypal_native_checkout/raw/main/resources/media/flutter_paypal_ios.gif?raw=true" alt="Screenshot iOS" height="400" />
+<img src="https://github.com/sammrafi/paypal_native_checkout/raw/main/resources/media/flutter_paypal_ios.gif?raw=true" alt="iOS Demo" height="400" />
+
 
 ## Usage
-Add `paypal_native_checkout` as a [dependency in your pubspec.yaml file](https://flutter.dev/docs/development/platform-integration/platform-channels). If you are targeting Android, make sure to read the *Android Platform Views* section [very important].
+
+Add `paypal_native_checkout` as a dependency in your `pubspec.yaml` file. For Android setup, ensure you have the necessary permissions and configurations in your `AndroidManifest.xml` and `build.gradle`.
 
 ## Android Platform Views
 Paypal requires that you make changes to your AndroidManifest.xml
 
 #### Prepare your app
 
-Define the android.permission.INTERNET permission in the `AndroidManifest.xml` file of your application as follows:
+Define the `android.permission.INTERNET` permission in the `AndroidManifest.xml` file of your application as follows:
 
 ```xml
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
@@ -48,69 +57,38 @@ add this to your `android/app/build.config`
 android {
     ...
 
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-
     defaultConfig {
-        // You must have a minSdkVersion of API 21 
-        //(Android 5.0 Lollipop) or later.
 
-        minSdkVersion 21
+        minSdkVersion 23
         ...
     }
 }
 
 ```
+
+
 #### Enable the SDK
-- Select your app from the My Apps & Credentials page on the Developer Dashboard.
-- Enter a Return URL.
-You can use an Android App Link registered within the Developer Console to handle SDK redirects.
-Alternatively, you can use your application ID (typically referenced via BuildConfig.APPLICATION_ID) and register your application ID with `://paypalpay` as the suffix. For example, if your application ID is `com.paypal.app,` input `com.paypal.app://paypalpay` in the Developer Console.
 
-- The return URL in the Developer Dashboard and the SDK must match exactly.
-  Note: If you change the return URL in the Developer Dashboard, PayPal must review your app again. The review period automatically begins any time the return URL changes.
+To enable the PayPal Mobile Checkout SDK:
 
-- Select the Log in with PayPal checkbox and the Full name and Email checkboxes found within the Advanced options. These are scopes of the Identity API.
-- The version of the Cardinal Consumer Authentication library used in the PayPal SDK does not support AndroidX natively. To prevent runtime crashes when a buyer needs to be verified through 3D Secure, you should add android.`enableJetifier=true` to your `android/gradle.properties` file.
+- Navigate to your app on the My Apps & Credentials page of the Developer Dashboard.
+- Go to Features > Other features and select the Log in with PayPal checkbox.
+- Click on Advanced Settings, where you'll find the Return URL field.
+  
+You have two options for setting the Return URL:
 
-#### Application ID
-Note: If your application ID contains underscores [ _ ] then you need to modify the returnUrl so that it forms a valid URI. For details, read this section or [Customize return URL](https://developer.paypal.com/limited-release/paypal-mobile-checkout/android/customize-return-url/).
+1. Use an Android App Link registered within the Developer Console to handle SDK redirects.
+2. Alternatively, use your application ID (typically referenced via BuildConfig.APPLICATION_ID) and append `://paypalpay` as the suffix to register your return URL. For example, if your application ID is `com.paypal.app`, enter `com.paypal.app://paypalpay`.
 
-A return URL redirects users back to the originating page during a checkout flow. For most integrations, using your application ID and `://paypalpay` is the simplest and best `returnUrl` to use as part of the CheckoutConfig. However, there are circumstances when you may need more control over the returnUrl, such as when your application ID has underscores.
+Ensure that the return URL in the Developer Dashboard exactly matches the one used in your SDK setup.
 
+Additional notes:
+- The application ID and return URL must use lowercase letters.
+- If you change the return URL in the Developer Dashboard, PayPal will require a review of your app.
+- Select the Full Name and Email checkboxes under Advanced Settings; these are scopes of the Identity API.
 
-##### Choose your custom return URL
-Your custom return URL:
+The SDK is now enabled for use in your application.
 
-- Can only use lowercase letters.
-- Can't contain any special characters.
-- Must end with `://paypalpay`.
-- Must match the return URL on your developer dashboard.
-To allow for seamless app switches, make your custom return URL unique. We recommend using reverse domain name notation.
-
-If you're creating a custom return URL because your application ID contains underscores, replace the underscores with periods. For example, change `com.paypal.example_payment_application` to `com.paypal.example.payment.application` .
-
-Modify the code
-- Copy the sample PayPal Mobile Checkout SDK code and paste it into the code for your mobile checkout page.
-For both activities, replace `YOUR-CUSTOM-SCHEME` with the custom return URL that you chose in Step 1. In the example above, instead of `com.paypal.example_payment_application`, you'd use `com.paypal.example.paypal.application`.
-
-- Your app can now respond to authentication and web checkout deep links.
-
-#### Migrating from V1?
-If you are migrating from Plugin V0.x.x. or V1.x.x 
-- You do not need to add custom activity to your flutter app anymore.
-remove the following from your `AndroidManifest.xml`
-
-```xml
-  <activity
-            android:name="com.paypal.openid.RedirectUriReceiverActivity"
-       .... />
-  <activity
-            android:name="com.paypal.pyplcheckout.home.view.activities.PYPLInitiateCheckoutActivity"
-           ... />
-```
 
 
 ### How to use the library
@@ -118,51 +96,68 @@ remove the following from your `AndroidManifest.xml`
 - Check out the example in `/example/lib/main.dart`
 
 ```dart
- import 'dart:math';
+
+import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:paypal_native_checkout/flutter_paypal.dart';
+import 'package:paypal_native_checkout/paypal_native_checkout.dart';
+import 'package:paypal_native_checkout/models/custom/currency_code.dart';
+import 'package:paypal_native_checkout/models/custom/environment.dart';
+import 'package:paypal_native_checkout/models/custom/order_callback.dart';
+import 'package:paypal_native_checkout/models/custom/purchase_unit.dart';
+import 'package:paypal_native_checkout/models/custom/user_action.dart';
 import 'package:paypal_native_checkout/str_helper.dart';
-import 'package:paypal_native_checkout/models/environment.dart';
-import 'package:paypal_native_checkout/models/currency_code.dart';
-import 'package:paypal_native_checkout/models/purchase_unit.dart';
-import 'package:paypal_native_checkout/models/user_action.dart';
-import 'package:paypal_native_checkout/models/order_callback.dart';
 
-void main() async {
+void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatefulWidget {
-  const MyApp({Key? key}) : super(key: key);
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
+  // This widget is the root of your application.
   @override
-  State<MyApp> createState() => _MyAppState();
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        useMaterial3: true,
+      ),
+      home: const MyHomePage(),
+    );
+  }
 }
 
-class _MyAppState extends State<MyApp> {
-  final _flutterPaypalPlugin = FlutterPaypal.instance;
+class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key});
+
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  final _paypalNativeCheckoutPlugin = PaypalNativeCheckout.instance;
   // log queue
   List<String> logQueue = [];
 
   @override
   void initState() {
     super.initState();
-
     initPayPal();
   }
 
   void initPayPal() async {
     //set debugMode for error logging
-    FlutterPaypal.isDebugMode = true;
+    PaypalNativeCheckout.isDebugMode = true;
 
     //initiate payPal plugin
-    await _flutterPaypalPlugin.init(
+    await _paypalNativeCheckoutPlugin.init(
       //your app id !!! No Underscore!!! see readme.md for help
-      returnUrl:
-          "com.sammrafi.flutter.paypal.flutter.paypal.example://paypalpay",
-       //client id from developer dashboard
-      clientID: "AZzDS9l0jS.....",
+      returnUrl: "com.example.example://paypalpay",
+      //client id from developer dashboard
+      clientID: "ATeY...",
       //sandbox, staging, live etc
       payPalEnvironment: FPayPalEnvironment.sandbox,
       //what currency do you plan to use? default is US dollars
@@ -172,27 +167,33 @@ class _MyAppState extends State<MyApp> {
     );
 
     //call backs for payment
-    _flutterPaypalPlugin.setPayPalOrderCallback(
+    _paypalNativeCheckoutPlugin.setPayPalOrderCallback(
       callback: FPayPalOrderCallback(
         onCancel: () {
-        //user canceled the payment
+          //user canceled the payment
           showResult("cancel");
         },
         onSuccess: (data) {
+          debugPrint("Paypal Success: $data");
           //successfully paid
           //remove all items from queue
-          _flutterPaypalPlugin.removeAllPurchaseItems();
-          String orderID = data.orderId ?? "";
-          showResult("Order successful $orderID");
+          _paypalNativeCheckoutPlugin.removeAllPurchaseItems();
+          String visitor = data.cart?.shippingAddress?.firstName ?? 'Visitor';
+          String address =
+              data.cart?.shippingAddress?.line1 ?? 'Unknown Address';
+          showResult(
+            "Order successful ${data.payerId ?? ""} - ${data.orderId ?? ""} - $visitor -$address",
+          );
         },
         onError: (data) {
-            //an error occured
+          debugPrint("Paypal Error: ${data.reason}");
+          //an error occured
           showResult("error: ${data.reason}");
         },
         onShippingChange: (data) {
-            //the user updated the shipping address
+          //the user updated the shipping address
           showResult(
-            "shipping change: ${data.shippingAddress?.addressLine1 ?? ""}",
+            "shipping change: ${data.shippingChangeAddress?.adminArea1 ?? ""}",
           );
         },
       ),
@@ -201,105 +202,65 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Plugin example app'),
-        ),
-        body: Center(
-          child: Column(
-            children: [
-              for (String t in logQueue) Text(t),
-              ElevatedButton(
-                child: const Text("Do payment"),
-                onPressed: () {
-                  //add item to cart. Max is between 4 to 8
-                  if (_paypalNativeCheckoutPlugin.canAddMorePurchaseUnit) {
-                    _flutterPaypalPlugin.addPurchaseUnit(
-                      FPayPalPurchaseUnit(
-                        // random prices
-                        amount: Random().nextDouble() * 100,
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: const Text("Paypal Native Checkout"),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            for (String t in logQueue) Text(t),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: Color.fromARGB(255, 16, 30, 227),
+                  foregroundColor: Colors.white),
+              child: const Text("Pay Now"),
+              onPressed: () {
+                //add 1 item to cart. Max is 4!
+                if (_paypalNativeCheckoutPlugin.canAddMorePurchaseUnit) {
+                  _paypalNativeCheckoutPlugin.addPurchaseUnit(
+                    FPayPalPurchaseUnit(
+                      // random prices
+                      amount: Random().nextDouble() * 100,
 
-                        ///please use your own algorithm for referenceId. Maybe ProductID?
-                        referenceId: FPayPalStrHelper.getRandomString(16),
-                      ),
-                    );
-                    // initPayPal();
-                    _flutterPaypalPlugin.makeOrder(
-                      action: FPayPalUserAction.payNow,
-                    );
-                  }
-                },
-              ),
-            ],
-          ),
+                      ///please use your own algorithm for referenceId. Maybe ProductID?
+                      referenceId: FPayPalStrHelper.getRandomString(16),
+                    ),
+                  );
+                }
+                Map<String, dynamic>? getAddress = {
+                  'line1': '456 Main Dt',
+                  'line2': 'Apt 4B',
+                  'city': 'San Jose',
+                  'state': 'CA',
+                  'postalCode': '95131',
+                  'countryCode': 'US',
+                };
+
+                _paypalNativeCheckoutPlugin.makeOrder(
+                    action: FPayPalUserAction.payNow, address: getAddress);
+              },
+            ),
+          ],
         ),
       ),
     );
   }
 
-// all to log queue
+  // all to log queue
   showResult(String text) {
     logQueue.add(text);
     setState(() {});
   }
 }
 
-
 ```
-
-
-### Notice
-
-- Max Number of items you can add to purchase units is between 4-6.
-Or else Paypal will throw an Exception!
-
-```dart
-
-  if (_paypalNativeCheckoutPlugin.canAddMorePurchaseUnit) {
-    _flutterPaypalPlugin.addPurchaseUnit(
-      FPayPalPurchaseUnit(
-        // random prices
-        amount: Random().nextDouble() * 100,
-
-        ///please use your own algorithm for referenceId. Maybe ProductID?
-        referenceId: FPayPalStrHelper.getRandomString(16),
-      ),
-    );
-  }
-```
-
 
 
 #### Troubleshooting Tips
 if you have trouble using this library, read these:
-- If you get
-```
-build\app\intermediates\packaged_manifests\debug\AndroidManifest.xml:97: error: resource style/AppFullScreenTheme (aka com.sammrafi.paypal_native_checkout_example:style/AppFullScreenTheme) not found.
-     error: failed processing manifest.
-```
-Remove the following from your `AndroidManifest.xml`. This is no longer required in V1
-```xml
-  <activity
-            android:name="com.paypal.openid.RedirectUriReceiverActivity"
-       .... />
-  <activity
-            android:name="com.paypal.pyplcheckout.home.view.activities.PYPLInitiateCheckoutActivity"
-           ... />
-```
-
-
-- Make sure your applicationId is registered in the developer dashboard as `applicationID://paypalpay` e.g `com.sammrafi.flutter.paypal.flutter.paypal.example://paypalpay` . after registering it, you may have to wait 3 hours for paypal to review it. You may also have to register your privacy url too.
-
-- underscore is not allowed e.g `com.sammrafi.flutter.paypal.flutter_paypal_example://paypalpay` is not allowed, only `com.sammrafi.flutter.paypal.flutter.paypal.example://paypalpay`
-
-- if you are using an emulator or physical phone for testing in debug mode and you keep getting `java.lang.ClassNotFoundException`, make sure that all applications with the app id are uninstalled. if you have multiple account on your mobile phone, there is the possiblity that flutter installed a new app on your phone -so you have to uninstall that first.
-  
-```
- Caused by: java.lang.ClassNotFoundException: Didn't find class "com.paypal.pyplcheckout.home.view.activities.PYPLInitiateCheckoutActivity" on path: DexPathList[[zip file "/data/app/com.sammrafi.paypal_native_checkout_example-not-b8OWFxjJhuMcKVK0gA==/base.apk"],nativeLibraryDirectories=[/data/app/com.sammrafi.paypal_native_checkout_example-not-b8OWFxjJhuMcKVK0gA==/lib/arm64, /data/app/com.sammrafi.paypal_native_checkout_example-not-b8OWFxjJhuMcKVK0gA==/base.apk!/lib/arm64-v8a, /system/lib64, /hw_product/lib64, /system/product/lib64]]
-
-```
-
 - if you have a problem with the `android:label` after using the package, add these to the application tag of your `Androidmanifest.xml`
 
 ```xml
@@ -308,7 +269,7 @@ Remove the following from your `AndroidManifest.xml`. This is no longer required
         tools:replace="android:label" 
         xmlns:tools="http://schemas.android.com/tools"
 ```
-.
+
 - The following should be activated in the developer console of Paypal for your account
 
 
@@ -318,6 +279,15 @@ Remove the following from your `AndroidManifest.xml`. This is no longer required
 * Vault
 * Fullname & email
 
-![Screenshot](https://github.com/harrowmykel/paypal_native_checkout/raw/main/resources/media/screenshots/screenshot_2.png?raw=true "Screenshot")
-![Screenshot](https://github.com/harrowmykel/paypal_native_checkout/raw/main/resources/media/screenshots/screenshot_1.png?raw=true "Screenshot")
-![Screenshot](https://github.com/harrowmykel/paypal_native_checkout/raw/main/resources/media/screenshots/screenshot_3.png?raw=true "Screenshot")
+![Screenshot](https://github.com/sammrafi/paypal_native_checkout/raw/main/resources/media/screenshots/screenshot_2.png?raw=true "Screenshot")
+![Screenshot](https://github.com/sammrafi/paypal_native_checkout/raw/main/resources/media/screenshots/screenshot_1.png?raw=true "Screenshot")
+![Screenshot](https://github.com/sammrafi/paypal_native_checkout/raw/main/resources/media/screenshots/screenshot_3.png?raw=true "Screenshot")
+
+
+
+## Updates by Sammrafi
+This package is based on [flutter_paypal_native](https://github.com/harrowmykel/flutter_paypal_native) by [harrowmykel](https://github.com/harrowmykel).
+
+---
+
+Original package credits and link to the original GitHub repository can be found [here](https://github.com/harrowmykel/flutter_paypal_native).
