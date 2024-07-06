@@ -116,7 +116,21 @@ public class SwiftPaypalNativeCheckoutPlugin: NSObject, FlutterPlugin {
         }
         let purchaseUnitsStr = args["purchaseUnits"] as! String
         let userActionStr = args["userAction"] as! String
+        let shippingPreferenceStr = args["shippingPreference"] as! String
         let userAction = userActionFromString(userActionStr)
+        
+        //shipping prefersence
+        var shippingPreference: PayPalCheckout.OrderApplicationContext.ShippingPreference = .noShipping
+            switch shippingPreferenceStr {
+            case "NO_SHIPPING":
+                shippingPreference = .noShipping
+            case "SET_PROVIDED_ADDRESS":
+                shippingPreference = .setProvidedAddress
+            case "GET_FROM_FILE":
+                shippingPreference = .getFromFile
+            default:
+                shippingPreference = .noShipping
+            }
 
         let listCustomUnit = try! JSONDecoder().decode([CustomUnit].self, from: purchaseUnitsStr.data(using: .utf8)!)
         
@@ -139,6 +153,8 @@ public class SwiftPaypalNativeCheckoutPlugin: NSObject, FlutterPlugin {
             }
         }
 
+        
+
         var purchaseUnits: [PurchaseUnit] = []
         for customUnit in listCustomUnit {
             let amount = PayPalCheckout.PurchaseUnit.Amount(
@@ -149,7 +165,7 @@ public class SwiftPaypalNativeCheckoutPlugin: NSObject, FlutterPlugin {
             let purchaseUnit = PayPalCheckout.PurchaseUnit(
                     amount: amount,
                     referenceId: customUnit.referenceId,
-                    shipping: shipping
+                    shipping: shipping         
             )
 
             purchaseUnits.append(purchaseUnit)
@@ -161,7 +177,7 @@ public class SwiftPaypalNativeCheckoutPlugin: NSObject, FlutterPlugin {
                     let order = OrderRequest(
                             intent: .authorize,
                             purchaseUnits: purchaseUnits,
-                            applicationContext: OrderApplicationContext(userAction: userAction)
+                            applicationContext: OrderApplicationContext(shippingPreference: shippingPreference, userAction: userAction)
                     )
                     action.create(order: order)
                     print("Order created: \(order)")
