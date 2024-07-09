@@ -219,9 +219,9 @@ public class PaypalNativeCheckoutPlugin extends FlutterRegistrarResponder
 
                         }
 
-
+//                        AUTHORIZE
                         OrderRequest order = new OrderRequest(
-                                OrderIntent.AUTHORIZE,
+                                OrderIntent.CAPTURE,
                                 new AppContext.Builder().userAction(userAction).shippingPreference(shippingPreference).build(),
                                 purchaseUnits);
 

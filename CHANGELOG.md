@@ -1,3 +1,8 @@
+### Version 1.0.3
+
+- Fixed issue with multiple additions.
+
+
 ### Version 1.0.2
 
 - Added shipping preference functionality to the PayPal Native SDK.
