@@ -79,7 +79,7 @@ public class SwiftPaypalNativeCheckoutPlugin: NSObject, FlutterPlugin {
         ))
     }
 
-    func createShipping(from addressDetails: [String: Any]) -> PurchaseUnit.Shipping? {
+    func createShipping(from addressDetails: [String: Any], name fullNameStr: String?) -> PurchaseUnit.Shipping? {
         guard let line1 = addressDetails["line1"] as? String,
               let city = addressDetails["city"] as? String,
               let state = addressDetails["state"] as? String,
@@ -88,20 +88,19 @@ public class SwiftPaypalNativeCheckoutPlugin: NSObject, FlutterPlugin {
             return nil
         }
 
-        // let recipientName = addressDetails["recipientName"] as? String,
     
         let line2 = addressDetails["line2"] as? String ?? ""
-    
-        return PurchaseUnit.Shipping(
-            address: .init(
-                countryCode: countryCode,
-                addressLine1: line1,
-                addressLine2: line2,
-                adminArea1: state,
-                adminArea2: city,
-                postalCode: postalCode
-            )
-        )
+        let fullName = fullNameStr ?? ""
+        let shippingName = fullName.isEmpty ? nil : PurchaseUnit.ShippingName.init(fullName: fullName)
+        let address = OrderAddress(
+        countryCode: countryCode,
+        addressLine1: line1,
+        addressLine2: line2,
+        adminArea1: state,
+        adminArea2: city,
+        postalCode: postalCode
+    )
+        return PurchaseUnit.Shipping(shippingName: shippingName, address: address)
     }
 
 
@@ -115,6 +114,7 @@ public class SwiftPaypalNativeCheckoutPlugin: NSObject, FlutterPlugin {
             return
         }
         let purchaseUnitsStr = args["purchaseUnits"] as! String
+        let fullNameStr = args["fullName"] as? String
         let userActionStr = args["userAction"] as! String
         let shippingPreferenceStr = args["shippingPreference"] as! String
         let userAction = userActionFromString(userActionStr)
@@ -140,7 +140,7 @@ public class SwiftPaypalNativeCheckoutPlugin: NSObject, FlutterPlugin {
             if let addressData = addressJson.data(using: .utf8) {
                 do {
                     if let addressDetails = try JSONSerialization.jsonObject(with: addressData, options: []) as? [String: Any] {
-                        shipping = createShipping(from: addressDetails)
+                        shipping = createShipping(from: addressDetails, name: fullNameStr)
                     }
                 } catch {
                     result(FlutterError(

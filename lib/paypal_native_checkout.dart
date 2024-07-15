@@ -109,8 +109,10 @@ class PaypalNativeCheckout {
   ///was not called before this function
   Future<void> makeOrder({
     FPayPalUserAction action = FPayPalUserAction.payNow,
-    FPayPalShippingPreference shippingPreference = FPayPalShippingPreference.getFromFile,
+    FPayPalShippingPreference shippingPreference =
+        FPayPalShippingPreference.getFromFile,
     Map<String, dynamic>? address,
+    String? fullName,
   }) async {
     if (!_initiated) {
       throw Exception(
@@ -127,11 +129,17 @@ class PaypalNativeCheckout {
       "userAction": FPayPalUserActionHelper.convertFromEnumToString(
         action,
       ),
-      "shippingPreference": FPayPalShippingPreferenceHelper.convertFromEnumToString(shippingPreference)
+      "shippingPreference":
+          FPayPalShippingPreferenceHelper.convertFromEnumToString(
+              shippingPreference)
     };
 
     if (address != null) {
       data["address"] = jsonEncode(address);
+    }
+
+    if (fullName != null) {
+      data["fullName"] = fullName;
     }
 
     await _methodChannel.invokeMethod<String>('FlutterPaypal#makeOrder', data);
