@@ -9,6 +9,7 @@ Introducing a Flutter plugin for seamless PayPal payments with native support fo
 ### Improvements
 - Fixed endless loading issue.
 - Added support for passing shipping address from Flutter.
+- Shipping Preference Feature to add address or not 
 
   
 ## Requirements

@@ -171,11 +171,11 @@ public class SwiftPaypalNativeCheckoutPlugin: NSObject, FlutterPlugin {
             purchaseUnits.append(purchaseUnit)
         }
 
-        
+
         Checkout.start(
                 createOrder: { action in
                     let order = OrderRequest(
-                            intent: .authorize,
+                            intent: .capture,
                             purchaseUnits: purchaseUnits,
                             applicationContext: OrderApplicationContext(shippingPreference: shippingPreference, userAction: userAction)
                     )

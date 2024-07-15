@@ -144,20 +144,17 @@ class _MyHomePageState extends State<MyHomePage> {
                   foregroundColor: Colors.white),
               child: const Text("Pay Now"),
               onPressed: () {
+                _paypalNativeCheckoutPlugin.removeAllPurchaseItems();
                 //add 1 item to cart. Max is 4!
                 if (_paypalNativeCheckoutPlugin.canAddMorePurchaseUnit) {
                   _paypalNativeCheckoutPlugin.addPurchaseUnit(
-                    FPayPalPurchaseUnit(
-                      // random prices
-                      amount: Random().nextDouble() * 100,
-
-                      ///please use your own algorithm for referenceId. Maybe ProductID?
-                      referenceId: FPayPalStrHelper.getRandomString(16),
-                    ),
-                  );
+                      FPayPalPurchaseUnit(
+                          amount: 2.5,
+                          currencyCode: FPayPalCurrencyCode.eur,
+                          referenceId: "3cdfc8fc-e28b-4295-81f9-44b698e01678"));
                 }
                 Map<String, dynamic>? getAddress = {
-                  'line1': '456 Main Dt',
+                  'line1': '456 Sammrafi',
                   'line2': 'Apt 4B',
                   'city': 'San Jose',
                   'state': 'CA',
