@@ -20,6 +20,7 @@ import com.paypal.checkout.order.PurchaseUnit;
 import com.paypal.checkout.order.Address;
 import com.paypal.checkout.order.Shipping;
 
+import com.paypal.checkout.order.ShippingName;
 import com.sammrafi.paypal_native_checkout.models.CheckoutConfigStore;
 import com.sammrafi.paypal_native_checkout.models.CurrencyCodeHelper;
 import com.sammrafi.paypal_native_checkout.models.EnvironmentHelper;
@@ -186,10 +187,19 @@ public class PaypalNativeCheckoutPlugin extends FlutterRegistrarResponder
                         .countryCode(addressObject.getString("countryCode"))
                         .build();
 
-                shipping = new Shipping.Builder()
-                        .address(address)
-                        .build();
 
+                if (call.argument("fullName") != null) {
+                    String fullName = call.argument("fullName");
+                    ShippingName shippingName = new ShippingName(fullName);
+                    shipping = new Shipping.Builder()
+                            .address(address)
+                            .shippingName(shippingName)
+                            .build();
+                }else{
+                    shipping = new Shipping.Builder()
+                            .address(address)
+                            .build();
+                }
             } catch (JSONException e) {
                 result.error("JSON_PARSE_ERROR", "Error parsing address JSON", e.getLocalizedMessage());
                 return;

@@ -1,3 +1,6 @@
+### Version 1.0.4
+- added fullName
+
 ### Version 1.0.3
 
 - Fixed issue with multiple additions.
