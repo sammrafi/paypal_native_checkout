@@ -32,6 +32,8 @@ rootProject.allprojects {
 apply plugin: 'com.android.library'
 
 android {
+    namespace "com.sammrafi.paypal_native_checkout"
+    
     compileSdkVersion 31
 
     compileOptions {
